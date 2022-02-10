@@ -14,6 +14,11 @@
   <!--<table data-sort-name=stargazers_count data-sort-order=desc  -->
     <script src=https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js></script>
 
+    <script>
+        function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+    </script>
 <style>
 
     .chart_title{
@@ -69,10 +74,10 @@
     <div style='font-size:24px; text-align:center'> <u> Business Working Assumption: </u></div>
     <div class="assumptions">
        Step 1: Once the order is placed by customer to a restaurant, the restaurant accepts the order. <br>
-       Step 2: Once the order is accepted by restaurant, the delivery agent starts to the restaurant <br>
-       Step 3: Once delivery agent reaches restaurant, and after the food is ready, he starts to the customer address <br>
+       Step 2: Once the order is accepted by restaurant, the Driver starts to the restaurant <br>
+       Step 3: Once Driverreaches restaurant, and after the food is ready, he starts to the customer address <br>
         <span style='color:red;padding-left:100px;font-size:14px'> This metric (when customer starts from restaurant) is unavailable</span> <br>
-        Step 4: Delivery Agent  transists from restaurant to customer's place and delliver's order
+        Step 4: Driver  transists from restaurant to customer's place and delliver's order
     </div>
 
 
@@ -120,7 +125,7 @@
             
             <div  style="width:40%;float:left;position:relative;display:block">
                 <div class="chart_title">
-                 In 90% of orders Delivery agents reached restaurant before 30 mins
+                 In 90% of orders , Drivers reached restaurant before 30 mins
                 </div>
                 <div id="step2_chart">
 
@@ -128,7 +133,7 @@
             </div>
             <div id="step2_info" style="width:50%;padding-left:10%;float:left;position:relative;display:block">
                 <div class="chart_title">
-                    List of Delivery agents whose Avg. time to restaurant is  > 30 minutes
+                    List of Drivers whose Avg. time to restaurant is  > 30 minutes
                    </div>
                 <table id="step2_table"  > 
 
@@ -137,8 +142,8 @@
 
         </div>
         <div class='analyzing_results' style='padding:10px;clear:both;position:relative;width:100%;text-align: center;padding-top:20px;font-size: 20px;font-family: "Montserrat", sans-serif;padding-bottom:10px ;background-image: linear-gradient(#c7d875, #8c9c35);'>
-           <b> Insights:</b> Delivery agents like 41,43,48,56 delivered many orders but their avg. time to restaurant is comparitively high. more info needs to be checked to conclude if it is delay caused by delivery agent. <br>
-           these scenarios can be used to test the delievery agent assign algorithm to minimize time in this step
+           <b> Insights:</b>Drivers like 41,43,48,56 delivered many orders but their avg. time to restaurant is comparitively high. more info needs to be checked to conclude if it is delay caused by Driver. <br>
+           these scenarios can be used to test the Drivers assign algorithm to minimize time in this step
         </div>
 
     </div>
@@ -148,13 +153,13 @@
         <div class="step_title">
             Step 4: Time taken by driver from restaurant to delivery
     </div>
-    <div id="section3_chart">
+    <table id="step3_table">
 
-    </div>
+    </table>
     <div class='analyzing_results' style='padding:10px;clear:both;position:relative;width:100%;text-align: center;padding-top:20px;font-size: 20px;font-family: "Montserrat", sans-serif;padding-bottom:10px ;background-image: linear-gradient(#c7d875, #8c9c35);'>
         <b> Insights:</b> 
-    This data is pretty consistent. could be because cutsomers would be able to choose restaurant within certain radius of deliver. 
-    </div>
+        The above drivers should be contacted to understand how their delivery time can be improved
+     </div>
     </div>
 
 </body>
@@ -163,7 +168,7 @@
 
 function populate_step1_table(){
 
-    d3.csv("/Data/section1_table.csv").then( function(data) {
+    d3.csv("/FoodDelivery/Data/section1_table.csv").then( function(data) {
     
 
     var dataSet = []
@@ -223,14 +228,13 @@ const margin = {top: 30, right: 30, bottom: 70, left: 60},
 // append the svg object to the body of the page
 const svg = d3.select("#step1_chart").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
-svg.append("rect").attr("x" , 400).attr("y",-20).attr("width",20).attr("height",20).attr("fill","#69b3a2")
-svg.append("text").attr("x" , 440).attr("y",-5).text("Time to delivery (from order)")
+
 
 svg.append("rect").attr("x" , 650).attr("y",-10).attr("width",20).attr("height",3).attr("fill","blue")
 svg.append("text").attr("x" , 680).attr("y",-5).text("Driver Enagaged time (from reaching restaurant to delivery)")
 
 // Parse the Data
-d3.csv("/Data/step_1_chart.csv").then( function(data) {
+d3.csv("/FoodDelivery/Data/step_1_chart.csv").then( function(data) {
 
 
 // X axis
@@ -277,7 +281,7 @@ svg.append("g").selectAll("bar")
 
     function populate_step2_table(){
     
-        d3.csv("/Data/section2_table.csv").then( function(data) {
+        d3.csv("/FoodDelivery/Data/section2_table.csv").then( function(data) {
         
     
         var dataSet = []
@@ -336,14 +340,10 @@ svg.append("g").selectAll("bar")
     // append the svg object to the body of the page
     const svg = d3.select("#step2_chart").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
     
-    svg.append("rect").attr("x" , 400).attr("y",-20).attr("width",20).attr("height",20).attr("fill","#69b3a2")
-    svg.append("text").attr("x" , 440).attr("y",-5).text("Time to delivery (from order)")
     
-    svg.append("rect").attr("x" , 650).attr("y",-10).attr("width",20).attr("height",3).attr("fill","blue")
-    svg.append("text").attr("x" , 680).attr("y",-5).text("Driver Enagaged time (from reaching restaurant to delivery)")
     
     // Parse the Data
-    d3.csv("/Data/section2_chart_data.csv").then( function(data) {
+    d3.csv("/FoodDelivery/Data/section2_chart_data.csv").then( function(data) {
     
     
     // X axis
@@ -385,11 +385,67 @@ svg.append("g").selectAll("bar")
     </script>
 
 <script>
+     function populate_step3_table(){
+    
+    d3.csv("/FoodDelivery/Data/section3_table.csv").then( function(data) {
+    
+
+    var dataSet = []
+
+                                
+
+    			
+
+data.map(d => {
+    
+     dataSet.push([
+          d["driver_Id"],
+         d["Avg.Time"],
+           d["#Orders"],  d["Sale"] ,  d["Tip"]
+     ])     
+  
+     
+});
+
+                
+
+var sceanriotable_section_1 = $('#step3_table').DataTable(
+           {"destroy": true,"responsive": true, "iDisplayLength": 10, "bProcessing": true,"bDeferRender": true,
+"paging": true,"aaData": dataSet,"info" : false,  "lengthChange": false, "aoColumns": [
+       { title: "Driver Id" },
+           { title: "Avg. TimeToReach Customer from restaurant" },
+           { title: "#Orders" },
+           { title: "$Sale" },
+           { title: "TTL_Tip" }
+       ],
+"columnDefs": [
+{
+   "render": function ( data, type, row ) {
+                   return numberWithCommas(data);
+               },
+               "data-sort": function ( data, type, row ) {
+                   return  data;
+               },
+               "targets": [3]}
+  
+
+   
+]})
+
+
+
+    });
+}
+
+</script>
+<script>
     populate_step1_chart();
     populate_step1_table();
 
     populate_step2_chart();
     populate_step2_table();
+
+    populate_step3_table();
 </script>
 
 </html>
