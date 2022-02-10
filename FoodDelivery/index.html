@@ -1,0 +1,384 @@
+<html>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  
+  
+  <link href=https://cdn.datatables.net/1.11.4/css/jquery.dataTables.min.css rel=stylesheet>
+  
+  <!--<table data-sort-name=stargazers_count data-sort-order=desc  -->
+    <script src=https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js></script>
+
+<style>
+
+    .chart_title{
+        position: relative;
+        background-color: #444;
+        color:white;
+        width:100%;
+        padding:10px;
+        font-size:18px;
+        top:-20px;
+    }
+    .page-title{
+    position:relative;
+    z-index:100;
+    color:white;
+    font-size:35;
+    background-color: black;
+    text-align: center;
+}
+
+.Graph_insight{
+    position:relative;
+
+}
+
+.Graph_action{
+    position:relative;
+    padding-left:20px
+}
+
+.assumptions{
+    position: relative;
+    padding-left: 150px;
+    font-family: "Montserrat", sans-serif;
+    font-size:20px;
+
+}
+
+.step_title{
+    font-size:28px;
+    background-color:#aaa;
+    text-align:center;
+    padding-top:10px;
+    margin-top:10px
+}
+</style>
+<body style='width:1400px;padding-left:20px'>
+
+
+    <div  class='page-title'>
+        Analyzing the Time to delivery of orders in a Month
+    </div>
+    <div style='font-size:24px; text-align:center'> <u> Business Working Assumption: </u></div>
+    <div class="assumptions">
+       Step 1: Once the order is placed by customer to a restaurant, the restaurant accepts the order. <br>
+       Step 2: Once the order is accepted by restaurant, the delivery agent starts to the restaurant <br>
+       Step 3: Once delivery agent reaches restaurant, and after the food is ready, he starts to the customer address <br>
+        <span style='color:red;padding-left:100px;font-size:14px'> This metric (when customer starts from restaurant) is unavailable</span> <br>
+        Step 4: Delivery Agent  transists from restaurant to customer's place and delliver's order
+    </div>
+
+
+    <div id="step1">
+
+        <div class="step_title">
+                Step 1: Time taken by restaurant to accept order
+        </div>
+        <div class="chart_area" style="position:relative;padding-top:20px">
+            
+            <div  style="width:40%;float:left;position:relative;display:block">
+                <div class="chart_title">
+                 90% of orders get accepeted by restaurants in less than 30 mins
+                </div>
+                <div id="step1_chart">
+
+                </div>
+            </div>
+            <div id="step1_info" style="width:50%;padding-left:10%;float:left;position:relative;display:block">
+                <div class="chart_title">
+                    List of Restaurants which accept order in more than 30 minutes
+                   </div>
+                <table id="step1_table"  > 
+
+                </table>
+            </div>
+
+        </div>
+        <div class='analyzing_results' style='padding:10px;clear:both;position:relative;width:100%;text-align: center;padding-top:20px;font-size: 20px;font-family: "Montserrat", sans-serif;padding-bottom:10px ;background-image: linear-gradient(#c7d875, #8c9c35);'>
+           <b> Insights:</b> Certain restaurants like (9, 12, 63, 10, 27, 100, 47) are taking more than 30mins (30% more than Avg.) to accept the order which is inturn delaying the delivery time.
+            Company operation manager need to connect with the restaurants to understand the reasons behind this delay and try to improve the time to deliver.
+   
+        </div>
+
+    </div>
+
+  
+
+    <div id="step2">
+
+        <div class="step_title">
+                Step 2: Time taken by driver to reach restaurant
+        </div>
+        <div class="chart_area" style="position:relative;padding-top:20px">
+            
+            <div  style="width:40%;float:left;position:relative;display:block">
+                <div class="chart_title">
+                 In 90% of orders Delivery agents reached restaurant before 30 mins
+                </div>
+                <div id="step2_chart">
+
+                </div>
+            </div>
+            <div id="step2_info" style="width:50%;padding-left:10%;float:left;position:relative;display:block">
+                <div class="chart_title">
+                    List of Delivery agents whose Avg. time to restaurant is  > 30 minutes
+                   </div>
+                <table id="step2_table"  > 
+
+                </table>
+            </div>
+
+        </div>
+        <div class='analyzing_results' style='padding:10px;clear:both;position:relative;width:100%;text-align: center;padding-top:20px;font-size: 20px;font-family: "Montserrat", sans-serif;padding-bottom:10px ;background-image: linear-gradient(#c7d875, #8c9c35);'>
+           <b> Insights:</b> Delivery agents like 41,43,48,56 delivered many orders but their avg. time to restaurant is comparitively high. more info needs to be checked to conclude if it is delay caused by delivery agent. <br>
+           these scenarios can be used to test the delievery agent assign algorithm to minimize time in this step
+        </div>
+
+    </div>
+
+</body>
+
+<script>
+
+function populate_step1_table(){
+
+    d3.csv("/Data/section1_table.csv").then( function(data) {
+    
+
+    var dataSet = []
+
+    							
+
+
+data.map(d => {
+    
+     dataSet.push([
+          d.RestaurantId,
+         d["AvgTimeToAcceptOrder"],
+           d["#Orders"],  d["$Sale"],
+     d["$discount"]
+     ])     
+  
+     
+});
+
+				
+
+var sceanriotable_section_1 = $('#step1_table').DataTable(
+           {"destroy": true,"responsive": true, "iDisplayLength": 10, "bProcessing": true,"bDeferRender": true,
+"paging": true,"aaData": dataSet,"info" : false,  "lengthChange": false, "aoColumns": [
+       { title: "RestaurantId" },
+           { title: "Avg. TimeToAcceptOrder" },
+           { title: "#Orders" },
+           { title: "$Sale" },
+           { title: "$discount" }
+       ],
+"columnDefs": [
+{
+   "render": function ( data, type, row ) {
+                   return data;
+               },
+               "data-sort": function ( data, type, row ) {
+                   return  data;
+               },
+               "targets": [0,1,2,]}
+  
+
+   
+]})
+
+
+
+    });
+}
+
+    function populate_step1_chart()
+    {
+        d3.select("#step1_chart").selectAll("*").remove();
+
+const margin = {top: 30, right: 30, bottom: 70, left: 60},
+ width = 700 - margin.left - margin.right,height = 500 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+const svg = d3.select("#step1_chart").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+svg.append("rect").attr("x" , 400).attr("y",-20).attr("width",20).attr("height",20).attr("fill","#69b3a2")
+svg.append("text").attr("x" , 440).attr("y",-5).text("Time to delivery (from order)")
+
+svg.append("rect").attr("x" , 650).attr("y",-10).attr("width",20).attr("height",3).attr("fill","blue")
+svg.append("text").attr("x" , 680).attr("y",-5).text("Driver Enagaged time (from reaching restaurant to delivery)")
+
+// Parse the Data
+d3.csv("/Data/step_1_chart.csv").then( function(data) {
+
+
+// X axis
+const x = d3.scaleBand().range([ 0, width ]).domain(data.map(d => d.Time_To_accept_order)).padding(0.2);
+svg.append("g")
+  .attr("transform", `translate(0, ${height})`)
+  .call(d3.axisBottom(x))
+  .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
+
+// Add Y axis
+const y = d3.scaleLinear()
+  .domain([0,d3.max(data, d => d['%Orders'])] )
+  .range([ height, 40]);
+
+ 
+
+
+svg.append("g")
+  .call(d3.axisLeft(y));
+
+
+svg.append("text").attr("class","xaxis_title").attr("x",200).attr("y",430).text("#minutes to accept order by restaurant")
+
+
+svg.append("g").selectAll("bar")
+  .data(data)
+  .join("rect")
+    .attr("x", d => x(d.Time_To_accept_order))
+    .attr("y", d => y(d['%Orders']))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d['%Orders']) )
+    .attr("fill", "#69b3a2")
+
+    yaxis_label = svg.append("text").text("%of orders").attr("font-weight","100").attr("font-family", "Helvetica, Sans-Serif").attr("stroke","black").attr("text-anchor", "middle").attr("x", -270).attr("y",-40).attr("transform", "rotate(-90)")
+
+})
+    }
+</script>
+
+
+
+<script>
+
+    function populate_step2_table(){
+    
+        d3.csv("/Data/section2_table.csv").then( function(data) {
+        
+    
+        var dataSet = []
+    
+                                    
+    
+       			
+    
+    data.map(d => {
+        
+         dataSet.push([
+              d["Driver Id"],
+             d["Average of Time_Driver_reached_restaurant"],
+               d["#Orders"],  d["TTL_Tip"]
+         ])     
+      
+         
+    });
+    
+                    
+    
+    var sceanriotable_section_1 = $('#step2_table').DataTable(
+               {"destroy": true,"responsive": true, "iDisplayLength": 10, "bProcessing": true,"bDeferRender": true,
+    "paging": true,"aaData": dataSet,"info" : false,  "lengthChange": false, "aoColumns": [
+           { title: "Delivery agent Id" },
+               { title: "Avg. TimeToReach Reastaurant" },
+               { title: "#Orders" },
+               { title: "TTL_Tip" }
+           ],
+    "columnDefs": [
+    {
+       "render": function ( data, type, row ) {
+                       return data;
+                   },
+                   "data-sort": function ( data, type, row ) {
+                       return  data;
+                   },
+                   "targets": [0,1,2,]}
+      
+    
+       
+    ]})
+    
+    
+    
+        });
+    }
+    
+        function populate_step2_chart()
+        {
+            d3.select("#step2_chart").selectAll("*").remove();
+    
+    const margin = {top: 30, right: 30, bottom: 70, left: 60},
+     width = 700 - margin.left - margin.right,height = 500 - margin.top - margin.bottom;
+    
+    // append the svg object to the body of the page
+    const svg = d3.select("#step2_chart").append("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    svg.append("rect").attr("x" , 400).attr("y",-20).attr("width",20).attr("height",20).attr("fill","#69b3a2")
+    svg.append("text").attr("x" , 440).attr("y",-5).text("Time to delivery (from order)")
+    
+    svg.append("rect").attr("x" , 650).attr("y",-10).attr("width",20).attr("height",3).attr("fill","blue")
+    svg.append("text").attr("x" , 680).attr("y",-5).text("Driver Enagaged time (from reaching restaurant to delivery)")
+    
+    // Parse the Data
+    d3.csv("/Data/section2_chart_data.csv").then( function(data) {
+    
+    
+    // X axis
+    const x = d3.scaleBand().range([ 0, width ]).domain(data.map(d => d.Time_To_Reach)).padding(0.2);
+    svg.append("g")
+      .attr("transform", `translate(0, ${height})`)
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+        .attr("transform", "translate(-10,0)rotate(-45)").style("text-anchor", "end");
+    
+    // Add Y axis
+    const y = d3.scaleLinear()
+      .domain([0,d3.max(data, d => d['%Orders'])] )
+      .range([ height, 40]);
+    
+     
+    
+    
+    svg.append("g")
+      .call(d3.axisLeft(y));
+    
+    
+    svg.append("text").attr("class","xaxis_title").attr("x",200).attr("y",430).text("#minutes to accept order by restaurant")
+    
+    
+    svg.append("g").selectAll("bar")
+      .data(data)
+      .join("rect")
+        .attr("x", d => x(d.Time_To_Reach))
+        .attr("y", d => y(d['%Orders']))
+        .attr("width", x.bandwidth())
+        .attr("height", d => height - y(d['%Orders']) )
+        .attr("fill", "#69b3a2")
+    
+        yaxis_label = svg.append("text").text("%of orders").attr("font-weight","100").attr("font-family", "Helvetica, Sans-Serif").attr("stroke","black").attr("text-anchor", "middle").attr("x", -270).attr("y",-40).attr("transform", "rotate(-90)")
+    
+    })
+        }
+    </script>
+
+<script>
+    populate_step1_chart();
+    populate_step1_table();
+
+    populate_step2_chart();
+    populate_step2_table();
+</script>
+
+</html>
+
+
+
